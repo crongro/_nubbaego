@@ -59,9 +59,10 @@ javascript:
 
 	    //push JSON Data
 	    function sendAjax(jd) {
-	    	var professor = false;
-	     	var url = "http://ui.nhnnext.org/phpcode/email_response.php";
-			if (isProfessor()) professor = true;
+	    	//var professor = false;
+	     	var url = "http://ui.nhnnext.org/demo/nubbaego/res/email_response.php";
+			//if (isProfessor()) professor = true;
+			var sDlGubun = getDLType();  //ex. next_allmem
 
 	    	var request = new XMLHttpRequest();
 
@@ -75,14 +76,14 @@ javascript:
 	                 //   console.log(obj.name);
 	             }
 	         };
-	         console.log('professor- > ' + professor);
-	         request.send('professor='+professor+'&data='+jd);
+	         console.log('sDlGubun- > ' + sDlGubun);
+	         request.send('dltype='+sDlGubun+'&data='+jd);
 	     }
 
-	     function isProfessor() {
-	     	var emailAddress = document.querySelector('.data a._mail').firstChild.nodeValue;
-	     	if (emailAddress.indexOf('professor') > 0 ) return true;
+	     function getDLType() {
+	     	var ele = document.querySelector('.data a._mail').firstChild.nodeValue;
+	     	var sDlGubun = ele.replace(/dl_(next[_.]*[a-zA-Z0-0_.$]+)@nhn\.com/, "$1");   
+	     	return sDlGubun;
 	     }
-
 	}
     $Element($$.getSingle('.paginate2 a.num')).fireEvent('click');

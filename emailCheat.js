@@ -4,8 +4,6 @@ function changeEmail(aEmailList) {
           aName.push(v.split(" ")[0]);
           return v.split(" ")[1];
 	});
-	console.log(aEmailParts);
-	console.log(aEmailParts.join());
     $('toInput').value = aEmailParts.join();   //add new string
 
     $Element($$.getSingle('#toUL li a.btn_del img')).fireEvent('click');  //delete first code
@@ -17,23 +15,28 @@ function changeEmail(aEmailList) {
     });
 
     //register event handler on img tag
+    //TODO.
+   	/*
     $Element('toUL').delegate('click' , "img" , function(oEvent) {
 	   	$Element(oEvent.element).disappear(3,function(){
    			alert("삭제합니다");
 		});
-	    var emailForDelete = oEvent.element.parentNode.parentNode.firstChild.firstChild.nodeValue;  //email Address
+	    var delMember = oEvent.element.parentNode.parentNode.firstChild.firstChild.nodeValue;  //email Address
+	    N_C._sDeleteMember = N_C._sDeleteMember + delMember +" ";
 	});
+	*/
 }
 
 
-var N_C  = {
+var N_C = {
 	_isGubunFlagNext : false,
-	_aEmailSum : []
+	_aEmailSum : [],
+	_sDeleteMember : "" 
 };
 
 
 function sendAjax(gubun) {
-	var url = "http://ui.nhnnext.org/phpcode/response_jsonfile_cors.php";
+	var url = "http://ui.nhnnext.org/demo/nubbaego/res/response_jsonfile_cors.php";
 	var request = new XMLHttpRequest();
 
 	request.open("POST", url, true);
@@ -47,43 +50,38 @@ function sendAjax(gubun) {
 	                N_C._aEmailSum = N_C._aEmailSum.concat(obj.emailName);
 
 	                if(N_C._isGubunFlagNext) {
-		                //console.log('aEmailSum -> ' + N_C._aEmailSum);
-	                	sendAjax('academic');
+	                	sendAjax('next_academic');
 	                	N_C._isGubunFlagNext = false;
-	                } else { 
-	                	changeEmail(N_C._aEmailSum);
-		                //console.log('aEmailSum -> ' + N_C._aEmailSum);
-	                }
+	                }else{ changeEmail(N_C._aEmailSum); }
 	    }
 	};
 	request.send('data='+gubun);
 }
 
 if( document.querySelector('#toUL li span ').firstChild != null) {
+	//var sDlName = document.querySelector('#toUL li span ').firstChild.nodeValue;
+	//var sDlGubun = sDlName.replace(/NEXT_.+\<dl_next.*@nhn\.com\>/, "$1");
+
 	var sDlName = document.querySelector('#toUL li span ').firstChild.nodeValue;
-	var sDlGubun = sDlName.replace(/NEXT_.+\<dl_next[_.](\w+)@nhn\.com\>/, "$1");
 
-	console.log(sDlGubun);
-
-	if(sDlGubun.length > 10) {
+	var isNextMail = /NEXT_.+\<dl_next.+@nhn\.com\>/.test(sDlName);
+	if(!isNextMail) {
 		alert("지원되지 않는 이메일 주소입니다\n 직원전체, 교수전체, 또는 NEXT전체만 지원해요~");
 	}else{
+		var sDlGubun = sDlName.replace(/NEXT_.+\<dl_(.+)@nhn\.com\>/, "$1");
 		ajaxController(sDlGubun);
-		//sendAjax(sDlGubun);
 	}
+
 } else {
 	alert("email 주소 입력하세요");
 	document.getElementById("toInput").focus();
 }
 
 function ajaxController(gubun) {
-		if(gubun == "allmem") {
+		if(gubun == "next_allmem") {
 			N_C._isGubunFlagNext = true;
-			sendAjax("professor");
+			sendAjax("next.professor");
 		}else{
 			sendAjax(gubun);
 		}
 }
-
-//1. 여기 접속
-//http://contact.nhncorp.com/viewDLMembers.nhn?email=dl_next.professor@nhn.com#
